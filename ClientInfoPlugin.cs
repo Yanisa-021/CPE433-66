@@ -5,54 +5,37 @@ using System.Net;
 
 namespace DNWS
 {
-  class ClientInfoPlugin : IPlugin
-  {
-    protected static Dictionary<String, int> statDictionary = null;
-    public ClientInfoPlugin()
+    class ClientInfoPlugin : IPlugin
     {
-      if (statDictionary == null)
-      {
-        statDictionary = new Dictionary<String, int>();
+        public void PreProcessing(HTTPRequest request)
+        {
+            
+        }
 
-      }
+        public HTTPResponse GetResponse(HTTPRequest request)
+        {
+            HTTPResponse response = new HTTPResponse(200);
+            StringBuilder sb = new StringBuilder();
+
+            IPEndPoint ep = IPEndPoint.Parse(
+                request.getPropertyByKey("remoteendpoint")
+            );
+
+            sb.Append("<html><body><pre>");
+            sb.Append("Client IP Address: " + ep.Address + "\n");
+            sb.Append("Client Port: " + ep.Port + "\n");
+            sb.Append("Browser Information: " + request.getPropertyByKey("user-agent") + "\n");
+            sb.Append("Accept-Language: " + request.getPropertyByKey("accept-language") + "\n");
+            sb.Append("Accept-Encoding: " + request.getPropertyByKey("accept-encoding") + "\n");
+            sb.Append("</pre></body></html>");
+
+            response.body = Encoding.UTF8.GetBytes(sb.ToString());
+            return response;
+        }
+
+        public HTTPResponse PostProcessing(HTTPResponse response)
+        {
+            return response;
+        }
     }
-
-    public void PreProcessing(HTTPRequest request)
-    {
-      if (statDictionary.ContainsKey(request.Url))
-      {
-        statDictionary[request.Url] = (int)statDictionary[request.Url] + 1;
-      }
-      else
-      {
-        statDictionary[request.Url] = 1;
-      }
-    }
-
-    public HTTPResponse GetResponse(HTTPRequest request)
-    {
-      HTTPResponse response = null;
-      StringBuilder sb = new StringBuilder();
-
-      IPEndPoint endpoint = IPEndPoint.Parse(request.getPropertyByKey("remoteendpoint"));
-      sb.Append("<html><body><pre>");
-      sb.AppendFormat("Client IP: {0}<br/>\n", endpoint.Address);
-      sb.AppendFormat("Client Port: {0}<br/>\n", endpoint.Port);
-      sb.AppendFormat("Browser Information: {0}<br/>\n", request.getPropertyByKey("user-agent").Trim());
-      sb.AppendFormat("Accept Language: {0}<br/>\n", request.getPropertyByKey("accept-language").Trim());
-      sb.AppendFormat("Accept Encoding: {0}<br/>\n", request.getPropertyByKey("accept-encoding").Trim());
-
-      sb.Append("</pre></body></html>");
-
-      response = new HTTPResponse(200);
-      response.body = Encoding.UTF8.GetBytes(sb.ToString());
-      return response;
-    }
-
-
-    public HTTPResponse PostProcessing(HTTPResponse response)
-    {
-      throw new NotImplementedException();
-    }
-  }
 }
