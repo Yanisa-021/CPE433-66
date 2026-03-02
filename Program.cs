@@ -297,8 +297,18 @@ namespace DNWS
                     // Get one, show some info
                     _parent.Log("Client accepted:" + clientSocket.RemoteEndPoint.ToString());
                     HTTPProcessor hp = new HTTPProcessor(clientSocket, _parent);
+                    // เพิ่ม
+                      if (threadingMode.Equals("Multi"))
+                {
+                    TaskInfo ti = new TaskInfo(hp);
+                    Thread thread = new Thread(new ParameterizedThreadStart(ThreadProc));
+                    thread.Start(ti);
+                }
+                else
+                {
                     hp.Process();
                 }
+                 }
                 catch (Exception ex)
                 {
                     _parent.Log("Server starting error: " + ex.Message + "\n" + ex.StackTrace);
