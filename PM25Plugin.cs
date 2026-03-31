@@ -50,22 +50,25 @@ namespace DNWS
                 }
             }
 
-            HTTPResponse response = null;
-            StringBuilder sb = new StringBuilder();
-            sb.Append("<html><body>");
-            sb.Append("Location : " + pm25reading.data.city.name + "<br />");
-            sb.Append("Date/Time : " + pm25reading.data.time.iso + "<br />");
-            sb.Append("PM25 : " + pm25reading.data.iaqi.pm25.v + "<br />");
-            sb.Append("PM10 : " + pm25reading.data.iaqi.pm10.v + "<br />");
-            sb.Append("</body></html>");
-            response = new HTTPResponse(200);
-            response.body = Encoding.UTF8.GetBytes(sb.ToString());
-            return response;
+            string json = "{";
+            json += "\"city\": \"" + pm25reading.data.city.name + "\",";
+            json += "\"time\": \"" + pm25reading.data.time.iso + "\",";
+            json += "\"pm25\": " + pm25reading.data.iaqi.pm25.v;
+            json += "}";
+
+            HTTPResponse response = new HTTPResponse(200);
+            response.headers.Add("Content-Type", "application/json");
+            response.body = Encoding.UTF8.GetBytes(json);
+
+            return response;  
         }
+
+
+
 
         public HTTPResponse PostProcessing(HTTPResponse response)
         {
             throw new NotImplementedException();
         }
     }
-}// fix JSON response
+}// new
