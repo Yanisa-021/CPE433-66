@@ -281,12 +281,13 @@ namespace DNWS
         public void Start()
         {
             _port = Convert.ToInt32(Program.Configuration["Port"]);
+            string threadingMode = Program.Configuration["ThreadingMode"] ?? "Single";
             IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Any, _port);
             // Create listening socket, queue size is 5 now.
             serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             serverSocket.Bind(localEndPoint);
             serverSocket.Listen(5);
-            _parent.Log("Server started at port " + _port + ".");
+            _parent.Log("Server started at port " + _port + " in " + threadingMode + " threading mode.");
             while (true)
             {
                 try
